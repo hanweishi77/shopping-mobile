@@ -1,29 +1,63 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import HomeView from '../views/HomeView.vue'
+
+import layoutIndex from '@/views/layout/index.vue'
+import searchIndex from '@/views/search/index.vue'
+import searchList from '@/views/search/list.vue'
+import productDetailIndex from '@/views/productDetail/index.vue'
+import loginIndex from '@/views/login/index.vue'
+import payIndex from '@/views/pay/index.vue'
+import myOrderIndex from '@/views/myOrder/index.vue'
+
+// 导入首页下的二级路由组件
+import homePage from '@/views/layout/home.vue'
+import categoryPage from '@/views/layout/category.vue'
+import cartPage from '@/views/layout/cart.vue'
+import userPage from '@/views/layout/user.vue'
 
 Vue.use(VueRouter)
 
 const routes = [
   {
     path: '/',
-    name: 'home',
-    component: HomeView
+    redirect: '/home',
+    component: layoutIndex,
+    children: [
+      { path: '/home', component: homePage },
+      { path: '/category', component: categoryPage },
+      { path: '/cart', component: cartPage },
+      { path: '/user', component: userPage }
+    ]
   },
   {
-    path: '/about',
-    name: 'about',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/AboutView.vue')
+    path: '/login',
+    component: loginIndex
+  },
+  {
+    path: '/search',
+    component: searchIndex
+  },
+  {
+    path: '/searchList',
+    component: searchList
+  },
+  {
+    path: '/productDetail/:id',
+    component: productDetailIndex
+  },
+  {
+    path: '/pay',
+    component: payIndex
+  },
+  {
+    path: '/myorder',
+    component: myOrderIndex
   }
 ]
 
 const router = new VueRouter({
   mode: 'history',
-  base: process.env.BASE_URL,
-  routes
+  routes: routes
 })
 
 export default router
