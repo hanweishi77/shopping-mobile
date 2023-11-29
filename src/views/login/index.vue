@@ -17,14 +17,14 @@
       </div>
       <div class="form">
         <div class="form-item">
-          <input type="text" class='inp' placeholder="请输入手机号码"/>
+          <input type="text" v-model="mobile" class='inp' placeholder="请输入手机号码"/>
         </div>
         <div class="form-item">
-          <input type="text" calss="inp" placeholder="请输入图形验证码"/>
-          <img src="" alt="" />
+          <input type="text" v-model="picCode" calss="inp" placeholder="请输入图形验证码"/>
+          <img v-show="picUrl" :src="picUrl" alt="" />
         </div>
         <div class="form-item">
-          <input type="text" class="inp" placeholder="请输入短信验证码"/>
+          <input type="text" v-model="msgCode" class="inp" placeholder="请输入短信验证码"/>
           <button>获取验证码</button>
         </div>
       </div>
@@ -35,9 +35,24 @@
 
 <script>
 import { Toast } from 'vant'
-
+import { getPicCode } from '@/api/login.js'
 export default {
   name: 'loginIndex',
+  data: function () {
+    return {
+      picKey: '', // 图形验证码唯一标识
+      picUrl: '', // 图形验证码地址
+      mobile: '', // 手机号
+      picCode: '', // 用户输入的图形验证码
+      msgCode: '' // 短信验证码
+    }
+  },
+  async created () {
+    const { data } = await getPicCode()
+    // console.log(data)
+    this.picKey = data.data.key
+    this.picUrl = data.data.base64
+  },
   methods: {
     onClickRight () {
       Toast('测试1')
