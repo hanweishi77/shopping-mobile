@@ -84,13 +84,13 @@ export default {
     },
     async getCode () {
       if (this.validateMobile() && this.validatePicCode() && !this.timerId) {
-        // 间歇函数开启,后续点击会停止开启间歇函数
+        // 间歇函数开启,后续点击会停止开启间歇函数（timerId是返回的非零数值）
         this.timerId = setInterval(() => {
           // 开启倒计时
           this.second--
           if (this.second <= 0) {
-            clearInterval(this.timerId) // 关闭定时器
-            this.timerId = null // 重置定时器id,用于下次判断是否开启
+            clearInterval(this.timerId) // 销毁定时器
+            this.timerId = null // 重置定时器id,用于下次判断是否了开启定时器
             this.second = this.totalSecond // 归位
           }
         }, 1000)
@@ -110,15 +110,19 @@ export default {
         } else {
           // 发送手机号、手机验证码给服务器进行校验登录
           const { data } = await postLoginCode(this.mobile, this.msgCode)
-          console.log(data.data)
-          // 本地localStorage存储token、userId
-          this.$store.commit('user/setUserInfo', data.data)
-          this.$toast('登录成功')
-          // 进行判断，看地址栏有无回跳地址
-          // 1. 如果有   => 说明是其他页面，拦截到登录来的，需要回跳
-          // 2. 如果没有 => 正常去首页
-          // const url = this.$route.query.backUrl || '/'
-          this.$router.replace('/')
+          console.log(data)
+          if (data.status !== 200) {
+            this.$toast(data.message)
+          } else {
+            this.$toast('登录成功')
+            // 本地localStorage存储token、userId
+            this.$store.commit('user/setUserInfo', data.data)
+            // 进行判断，看地址栏有无回跳地址
+            // 1. 如果有   => 说明是其他页面，拦截到登录来的，需要回跳
+            // 2. 如果没有 => 正常去首页
+            // const url = this.$route.query.backUrl || '/'
+            this.$router.replace('/')
+          }
         }
       }
     }
