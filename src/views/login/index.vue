@@ -4,7 +4,6 @@
     <van-nav-bar
       title="会员登录"
       left-text="返回"
-      right-text="测试"
       left-arrow
       @click-left="$router.go(-1)"
       @click-right="onClickRight"
@@ -36,7 +35,6 @@
 </template>
 
 <script>
-import { Toast } from 'vant'
 import { getPicCode, getMsgCode, postLoginCode } from '@/api/login.js'
 export default {
   name: 'loginIndex',
@@ -53,11 +51,17 @@ export default {
     }
   },
   async created () {
-    this.getPicCode()
+    console.log('页面元素已创建1')
+    try {
+      await this.getPicCode()
+    } catch (error) {
+      this.$toast('请求失败')
+      console.log('错误', error)
+    }
   },
   methods: {
     onClickRight () {
-      Toast('测试1')
+      this.$toast('测试1')
     },
     validateMobile () {
       if (/^1[3-9][0-9]{9}$/.test(this.mobile)) {
@@ -121,11 +125,16 @@ export default {
             // 1. 如果有   => 说明是其他页面，拦截到登录来的，需要回跳
             // 2. 如果没有 => 正常去首页
             // const url = this.$route.query.backUrl || '/'
+            console.log(this.$store.state.user.userInfo)
             this.$router.replace('/')
           }
         }
       }
     }
+  },
+  destoryed () {
+    // 清除资源
+    clearInterval(this.timerId)
   }
 }
 </script>

@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import user from '@/store/modules/userInfo.js'
+import user from './modules/userInfo.js'
 Vue.use(Vuex)
 
 export default new Vuex.Store({

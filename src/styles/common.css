@@ -12,3 +12,7 @@
   text-overflow: ellipsis;
   -webkit-box-orient: vertical;
 }
+/* 设置导航条 返回箭头 颜色 */
+.van-nav-bar .van-icon-arrow-left {
+  color: #333;
+}
