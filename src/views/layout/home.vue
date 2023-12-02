@@ -1,24 +1,18 @@
 <template>
   <div>
     <!-- 导航条 -->
-    <van-nav-bar title="智慧商城" />
+    <van-nav-bar :title="title" />
     <!-- 搜索框 -->
     <van-search v-model="inp" placeholder="请输入搜索关键词" />
     <!-- 轮播图 -->
-    <van-swipe :autoplay="3000">
-      <van-swipe-item>
-         <img src="@/assets/banner1.jpg" alt="">
-      </van-swipe-item>
-      <van-swipe-item>
-         <img src="@/assets/banner2.jpg" alt="">
-      </van-swipe-item>
-      <van-swipe-item>
-         <img src="@/assets/banner3.jpg" alt="">
+    <van-swipe :autoplay="2500">
+      <van-swipe-item v-for='item in bannerList' :key='item.imgUrl'>
+         <img :src="item.imgUrl" alt="">
       </van-swipe-item>
     </van-swipe>
     <!-- 导航 -->
     <van-grid :column-num="4">
-      <van-grid-item v-for="value in 8" :key="value" icon="photo-o" text="文字" />
+      <van-grid-item v-for="item in navList" :key="item.imgUrl" :icon="item.imgUrl" :text="item.text" />
     </van-grid>
     <!-- 主会场 -->
     <div class="main">
@@ -28,7 +22,7 @@
     <div class="guess">
       <p class="guess-title">—— 猜你喜欢 ——</p>
       <div class="goods-list">
-        <GoodsCard v-for="item in 5" :key="item"></GoodsCard>
+        <GoodsCard v-for="item in proList" :key="item.goods_id" :goodsDetail='item'></GoodsCard>
       </div>
     </div>
   </div>
@@ -36,6 +30,7 @@
 
 <script>
 import GoodsCard from '@/components/goodsCard.vue'
+import { getHomeData } from '@/api/home.js'
 export default {
   name: 'HomePage',
   components: {
@@ -43,8 +38,22 @@ export default {
   },
   data () {
     return {
-      inp: ''
+      inp: '',
+      title: '智慧商城', // 商城标题
+      bannerList: [], // 轮播
+      navList: [], // 导航
+      proList: [] // 商品
     }
+  },
+  async created () {
+    const { data: { data, message, status } } = await getHomeData()
+    console.log(data, message, status)
+    console.log(data.pageData.items)
+    this.title = data.pageData.page.params.title // 商城标题
+    this.bannerList = data.pageData.items[1].data // 轮播图片组
+    this.navList = data.pageData.items[3].data // 导航组
+    console.log(data.pageData.items[3].data)
+    this.proList = data.pageData.items[6].data // 商品组
   }
 }
 </script>
