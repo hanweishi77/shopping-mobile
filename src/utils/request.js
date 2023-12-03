@@ -9,8 +9,7 @@ const axiosInstance = axios.create({
 // Add a request interceptor
 axiosInstance.interceptors.request.use(function (config) {
   // Do something before request is sent
-  console.log('成功发送请求的拦截')
-  console.log(config)
+  // console.log(config)
   Toast.loading({
     message: '加载中...',
     forbidClick: true, // 禁止背景点击
@@ -20,19 +19,21 @@ axiosInstance.interceptors.request.use(function (config) {
   return config
 }, function (error) {
   // Do something with request error
+  Toast('发送请求失败')
   return Promise.reject(error)
 })
 // Add a response interceptor
 axiosInstance.interceptors.response.use(function (response) {
   // Any status code that lie within the range of 2xx cause this function to trigger
   // Do something with response data
-  console.log('成功返回响应的拦截')
+  // console.log(response)
   Toast.clear()
   // Toast(response.data.message) // Toast默认是单例模式，此处轻提示会将前一个清除
   return response
 }, function (error) {
   // Any status codes that falls outside the range of 2xx cause this function to trigger
   // Do something with response error
+  Toast('返回请求失败')
   return Promise.reject(error)
 })
 // 默认导出自定义配置的axios新实例
