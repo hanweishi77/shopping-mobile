@@ -18,7 +18,7 @@
 </template>
 
 <script>
-const goodsCard = {
+const goodsItem = {
   name: 'GoodsCardVue',
   props: {
     item: {
@@ -37,18 +37,8 @@ const goodsCard = {
   }
 }
 // 单个导出一般默认导出，导出的是一个对象,Vue.extend()方法调用，返回 VueComponent实例
-export default goodsCard
+export default goodsItem
 </script>
 
-<style scoped lang="less">
-/* 商品列表排布变卡片 */
-.van-card {
-  float: left;
-  width: 50%;
-  margin-top: 8px;
-  ::v-deep .van-card__header {
-   display: block;
-  }
-}
-
+<style>
 </style>
