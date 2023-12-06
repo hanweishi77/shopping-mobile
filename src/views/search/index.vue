@@ -3,25 +3,53 @@
     <van-nav-bar title="商品搜索"  left-arrow
       @click-left="$router.go(-1)"
     />
-    <van-search  placeholder="请输入搜索关键词" show-action>
+    <van-search v-model.trim="searchWord" placeholder="请输入搜索关键词" show-action clearable>
       <template #action>
-        <div @click="$router.push('/searchList')">搜索</div>
+        <div @click="goSearch(searchWord)">搜索</div>
       </template>
     </van-search>
-    <div class='title'><span>最近搜索</span><van-icon name="delete-o" size="24"/></div>
+    <div class='title'>
+      <span>最近搜索</span>
+      <van-icon name="delete-o" size="24" @click="clear" />
+    </div>
     <div class='flex'>
-      <van-tag round type="primary" size="large" color="gray">手机</van-tag>
-      <van-tag round type="primary" size="large" color="gray">冰箱</van-tag>
-      <van-tag round type="primary" size="large" color="gray">洗衣机</van-tag>
-      <van-tag round type="primary" size="large" color="gray">手机</van-tag>
-      <van-tag round type="primary" size="large" color="gray">冰箱</van-tag>
+      <van-tag v-for="(item, index) in historySearch"
+        @click='goSearch(item)'
+        round type="primary" size="large" color="gray" :key='index'>
+        {{item}}
+      </van-tag>
     </div>
   </div>
 </template>
 
 <script>
+import { getHistorySearch, setHistorySearch } from '@/utils/storage.js'
 export default {
-  name: 'searchIndex'
+  name: 'searchIndex',
+  data () {
+    return {
+      searchWord: '', // 输入框的内容
+      historySearch: getHistorySearch() // 历史记录
+    }
+  },
+  methods: {
+    goSearch (key) {
+      const index = this.historySearch.indexOf(key)
+      if (index !== -1) {
+        // 存在相同的项，将原有关键字移除
+        this.historySearch.splice(index, 1)
+      }
+      if (key !== '') {
+        this.historySearch.unshift(key)
+      }
+      setHistorySearch(this.historySearch)
+      this.$router.push(`/searchlist?search=${key}`)
+    },
+    clear () {
+      this.historySearch = [] // 页面搜索历史清空
+      setHistorySearch([]) // 清空本地localstorage中该数据
+    }
+  }
 }
 </script>
 

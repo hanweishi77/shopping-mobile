@@ -3,7 +3,7 @@
     <van-nav-bar title="商品列表"  left-arrow
       @click-left="$router.go(-1)"
     />
-    <van-search placeholder="手机" input-align="center" show-action
+    <van-search :placeholder="querySearch" input-align="center" show-action
       @click="$router.push('/search')" readonly>
       <template #action>
         <van-icon  :name="vanIcon"  size='26' @click="flag = !flag; vanIcon= flag ? 'list-switching' : 'list-switch' " />
@@ -11,12 +11,12 @@
     </van-search>
     <div class="choice">
       <span>综合</span>
-      <span>销量</span>
+      <span @click="proListSortByGoodsSales">销量</span>
       <div class="price">
         <span>价格</span>
         <div class="price-arrow">
-          <van-icon name="arrow-up"/>
-          <van-icon name="arrow-down"/>
+          <van-icon name="arrow-up" @click="proListSortByPrice(-1)" />
+          <van-icon name="arrow-down" @click="proListSortByPrice(1)" />
         </div>
       </div>
     </div>
@@ -32,6 +32,7 @@
 <script>
 import GoodsCard from '@/components/goodsCard.vue'
 import GoodsItem from '@/components/goodsItem.vue'
+import { getProList } from '@/api/product.js'
 export default {
   name: 'searchList',
   components: {
@@ -43,62 +44,44 @@ export default {
       // 切换下面商品卡片展示方式
       flag: true,
       vanIcon: 'list-switching',
-      proList: [{
-        goods_id: 10039,
-        goods_image: 'http://cba.itlike.com/public/uploads/10001/20230321/c4b5c61e46489bb9b9c0630002fbd69e.jpg',
-        goods_name: 'Apple-iPhone14ProMax 256G银色 移动联通电信 5G双卡双待手机',
-        goods_price_max: '9899.00',
-        goods_price_min: '9899.00',
-        goods_sales: 37039,
-        line_price_max: '20',
-        line_price_min: '18',
-        selling_point: ''
-      },
-      {
-        goods_id: 10040,
-        goods_image: 'http://cba.itlike.com/public/uploads/10001/20230321/c4b5c61e46489bb9b9c0630002fbd69e.jpg',
-        goods_name: 'Apple-iPhone14ProMax 256G银色 移动联通电信 5G双卡双待手机',
-        goods_price_max: '9899.00',
-        goods_price_min: '9899.00',
-        goods_sales: 37041,
-        line_price_max: '20',
-        line_price_min: '18',
-        selling_point: ''
-      },
-      {
-        goods_id: 10042,
-        goods_image: 'http://cba.itlike.com/public/uploads/10001/20230321/c4b5c61e46489bb9b9c0630002fbd69e.jpg',
-        goods_name: 'Apple-iPhone14ProMax 256G银色 移动联通电信 5G双卡双待手机',
-        goods_price_max: '9899.00',
-        goods_price_min: '9899.00',
-        goods_sales: 37039,
-        line_price_max: '20',
-        line_price_min: '18',
-        selling_point: ''
-      },
-      {
-        goods_id: 10045,
-        goods_image: 'http://cba.itlike.com/public/uploads/10001/20230321/c4b5c61e46489bb9b9c0630002fbd69e.jpg',
-        goods_name: 'Apple-iPhone14ProMax 256G银色 移动联通电信 5G双卡双待手机',
-        goods_price_max: '9899.00',
-        goods_price_min: '9899.00',
-        goods_sales: 37039,
-        line_price_max: '20',
-        line_price_min: '18',
-        selling_point: ''
-      },
-      {
-        goods_id: 10057,
-        goods_image: 'http://cba.itlike.com/public/uploads/10001/20230321/c4b5c61e46489bb9b9c0630002fbd69e.jpg',
-        goods_name: 'Apple-iPhone14ProMax 256G银色 移动联通电信 5G双卡双待手机',
-        goods_price_max: '9899.00',
-        goods_price_min: '9899.00',
-        goods_sales: 37039,
-        line_price_max: '20',
-        line_price_min: '18',
-        selling_point: ''
-      }]
+      page: 1,
+      proList: []
     }
+  },
+  computed: {
+    // 获取地址栏的搜索关键字
+    querySearch () {
+      return this.$route.query.search
+    }
+  },
+  methods: {
+    proListSortByGoodsSales () {
+      this.$toast('该功能未添加哦')
+    },
+    // 商品价格排序
+    proListSortByPrice (flag) {
+      // console.log(this.proList)
+      function ownSort (a, b) {
+        // 比较函数接收两参数 a-b比较，返回1，0，-1
+        if ((+a.goods_price_max) <= (+b.goods_price_max)) {
+          return -flag // a的价格小于等于b的价格,(降序是返回-1)
+        } else {
+          return flag // a的价格-b的价格,(降序是返回1)
+        }
+      }
+      this.proList.sort(ownSort)
+      // console.log(typeof this.proList[0].goods_price_max)
+      // console.log(this.proList[1].goods_price_max)
+    }
+  },
+  async created () {
+    const { data: { data: { list } } } = await getProList({
+      categoryId: this.$route.query.categoryId,
+      goodsName: this.querySearch,
+      page: this.page
+    })
+    console.log(list)
+    this.proList = list.data
   }
 }
 </script>
@@ -129,6 +112,7 @@ export default {
   justify-content: space-evenly;
 }
 .price-arrow .van-icon {
+  line-height: 4px;
   font-size: 14px;
 }
 </style>
