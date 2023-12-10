@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { Toast } from 'vant'
+import store from '@/store/index.js'
 
 // 创建 axios新实例，进行自定义配置
 const axiosInstance = axios.create({
@@ -16,6 +17,12 @@ axiosInstance.interceptors.request.use(function (config) {
     loadingType: 'spinner', // 配置loading图标
     duration: 0 // 0表示不会自动消失，其他数字代表持续时间(ms)
   })
+  // 只要有token，就在请求时携带，便于请求需要授权的接口
+  const token = store.state.user.userInfo.token
+  if (token) {
+    config.headers['Access-Token'] = token
+    config.headers.platform = 'H5'
+  }
   return config
 }, function (error) {
   // Do something with request error

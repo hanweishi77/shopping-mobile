@@ -1,7 +1,7 @@
 <template>
   <div class="cart">
-    <van-nav-bar title="购物车" fixed />
-    <div v-if="true">
+    <div class='to-fixed-top'><van-nav-bar title="购物车" fixed /></div>
+    <div v-if="isLogin && cartList.length > 0">
       <!-- 购物车开头 -->
       <div class="cart-title">
         <span class="all">共<i>5</i>件商品</span>
@@ -15,16 +15,17 @@
       </div>
       <!-- 购物车列表 -->
       <div class="cart-list">
-        <div class="cart-item" v-for="item in list" :key='item.name'>
+        <div class="cart-item" v-for="(item, index) in cartList" :key='index'>
           <van-checkbox :value="item.isChecked" @click="item.isChecked=!item.isChecked"></van-checkbox>
           <div class="show">
-            <img src="@/assets/product.jpg" alt="">
+            <img :src="item.goods.goods_image" alt="">
           </div>
           <div class="info">
-            <span class="tit text-ellipsis-2">商品名称</span>
+            <span class="tit text-ellipsis-2">{{item.goods.goods_name}}</span>
             <span class="bottom">
-              <div class="price">¥ <span>277.00</span></div>
-              <CountBox></CountBox>
+              <div class="price">¥ <span>{{item.goods.goods_price_max}}</span></div>
+              <!-- 既要形参value，又要调用函数传参 -->
+              <CountBox :value="item.goods_num" @input="(value) => changeCount(value, item.goods_id, item.goods_sku_id)"></CountBox>
             </span>
           </div>
         </div>
@@ -56,26 +57,50 @@
 
 <script>
 import CountBox from '@/components/CountBox.vue'
+import { mapState } from 'vuex'
 export default {
   name: 'cartPage',
   components: {
     CountBox
   },
-  data () {
+  data: function () {
     return {
-      isEdit: false,
-      list: [
-        { name: 'a', isChecked: false }, { name: 'b', isChecked: false },
-        { name: 'c', isChecked: true }, { name: 'c', isChecked: false }
-      ]
+      isEdit: false
+    }
+  },
+  computed: {
+    ...mapState('cart', ['cartList']),
+    isLogin () {
+      // console.log('@@', this.$store.state.user)
+      return this.$store.state.user.userInfo.token
+    }
+  },
+  methods: {
+    changeCount (goodsNum, goodsId, goodsSkuId) {
+      console.log(goodsNum, goodsId, goodsSkuId)
+      // 调用 vuex 的 action，进行数量的修改,并更新到后台服务器
+      this.$store.dispatch('cart/changeCountAction', {
+        goodsNum,
+        goodsId,
+        goodsSkuId
+      })
+    }
+  },
+  created () {
+    // 必须是登录过的用户，才能用户购物车列表
+    // console.log(this.isLogin)
+    if (this.isLogin) {
+      this.$store.dispatch('cart/getCartAction')
     }
   }
 }
 </script>
 <style lang="less" scoped>
+.to-fixed-top {
+  width: 100%;
+  height: 46px;
+}
 .cart {
-  padding-top: 46px;
-  padding-bottom: 100px;
   background-color: #f5f5f5;
   min-height: 100vh;
   .cart-title {

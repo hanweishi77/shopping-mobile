@@ -1,12 +1,36 @@
 <template>
   <div class="count-box">
-    <button class="minus">-</button>
-    <input  class="inp" value='1' type="text">
-    <button class="add">+</button>
+    <button class="minus" @click="subInp" :disabled="value <= 1 ? true : false">-</button>
+    <input  class="inp" :value="value" @change="setInp($event.target.value)" type="text">
+    <button class="add" @click="addInp">+</button>
   </div>
 </template>
 
 <script>
+export default {
+  name: 'CountBox',
+  props: {
+    value: {
+      type: Number,
+      default: 1
+    }
+  },
+  methods: {
+    addInp () {
+      this.$emit('input', this.value + 1)
+    },
+    subInp () {
+      if (this.value <= 1) {
+        return
+      }
+      this.$emit('input', this.value - 1)
+    },
+    setInp (value) {
+      // console.log(typeof value)
+      this.$emit('input', +value)
+    }
+  }
+}
 </script>
 
 <style lang="less" scoped>
