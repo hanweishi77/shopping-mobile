@@ -20,10 +20,10 @@
         </div>
       </div>
     </div>
-    <div class="goods-list" v-if="flag">
+    <div class="goods-list" v-show="flag">
       <GoodsItem v-for="item in proList" :key="item.goods_id" :item="item"></GoodsItem>
     </div>
-    <div class="goods-list" v-else>
+    <div class="goods-list" v-show="!flag">
       <GoodsCard v-for="item in proList" :key="item.goods_id" :item="item"></GoodsCard>
     </div>
   </div>
