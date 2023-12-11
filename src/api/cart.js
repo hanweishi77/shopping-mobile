@@ -13,3 +13,11 @@ export const changeCount = (goodsId, goodsNum, goodsSkuId) => {
     goodsSkuId
   })
 }
+
+// 向后端发送删除购物车商品数据
+export const delCart = (cartIds) => {
+  console.log('准备去后台删除购物车商品', cartIds)
+  return request.post('/cart/clear', {
+    cartIds
+  })
+}

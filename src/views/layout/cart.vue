@@ -15,8 +15,8 @@
       </div>
       <!-- 购物车列表 -->
       <div class="cart-list">
-        <div class="cart-item" v-for="(item, index) in cartList" :key='index'>
-          <van-checkbox :value="item.isChecked" @click="item.isChecked=!item.isChecked"></van-checkbox>
+        <div class="cart-item" v-for="item in cartList" :key='item.goods_id'>
+          <van-checkbox :value="item.isChecked" @click="toggleCheck(item.goods_id)"></van-checkbox>
           <div class="show">
             <img :src="item.goods.goods_image" alt="">
           </div>
@@ -41,7 +41,7 @@
             <span>¥ <i class="totalPrice">177.00</i></span>
           </div>
           <div v-if="!isEdit"  class="goPay">结算(3)</div>
-          <div v-else class="delete">删除</div>
+          <div v-else class="delete"  @click="handleDelCart">删除</div>
         </div>
       </div>
     </div>
@@ -76,14 +76,21 @@ export default {
     }
   },
   methods: {
+    toggleCheck (goodsId) {
+      this.$store.commit('cart/toggleCheck', goodsId)
+    },
     changeCount (goodsNum, goodsId, goodsSkuId) {
-      console.log(goodsNum, goodsId, goodsSkuId)
-      // 调用 vuex 的 action，进行数量的修改,并更新到后台服务器
+      // 去进行数量的修改,并更新到后台服务器
       this.$store.dispatch('cart/changeCountAction', {
         goodsNum,
         goodsId,
         goodsSkuId
       })
+    },
+    // 去删除购物车数据，并更新到后台服务器
+    async handleDelCart () {
+      await this.$store.dispatch('cart/delCartAction')
+      this.isEdit = false
     }
   },
   created () {
