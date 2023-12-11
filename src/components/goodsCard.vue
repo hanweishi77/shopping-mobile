@@ -1,6 +1,6 @@
 <template>
   <!-- 商品卡片组件 -->
-  <van-card
+  <van-card @click="$router.push(`/productDetail/${item.goods_id}`)"
     :price="item.goods_price_max"
     :desc="getName(1)"
     :title="getName(0)"

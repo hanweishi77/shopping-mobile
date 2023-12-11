@@ -11,8 +11,10 @@
       </van-swipe-item>
     </van-swipe>
     <!-- 导航 -->
-    <van-grid :column-num="4">
-      <van-grid-item v-for="item in navList" :key="item.imgUrl" :icon="item.imgUrl" :text="item.text" />
+    <van-grid :column-num="5">
+      <van-grid-item v-for="item in navList"
+        :key="item.imgUrl" :icon="item.imgUrl" :text="item.text"
+        @click="$router.push('/category')"/>
     </van-grid>
     <!-- 主会场 -->
     <div class="main">
