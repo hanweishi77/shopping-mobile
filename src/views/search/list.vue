@@ -30,11 +30,11 @@
 </template>
 
 <script>
-import GoodsCard from '@/components/goodsCard.vue'
-import GoodsItem from '@/components/goodsItem.vue'
+import GoodsCard from '@/components/GoodsCard.vue'
+import GoodsItem from '@/components/GoodsItem.vue'
 import { getProList } from '@/api/product.js'
 export default {
-  name: 'searchList',
+  name: 'SearchList',
   components: {
     GoodsCard,
     GoodsItem

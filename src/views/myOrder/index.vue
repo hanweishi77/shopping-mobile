@@ -4,7 +4,7 @@
 
 <script>
 export default {
-  name: 'myOrderIndex'
+  name: 'MyOrderIndex'
 }
 </script>
 

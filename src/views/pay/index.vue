@@ -4,7 +4,7 @@
 
 <script>
 export default {
-  name: 'payIndex'
+  name: 'PayIndex'
 }
 </script>
 

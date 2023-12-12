@@ -21,7 +21,7 @@
 <script>
 import { getCategoryData } from '@/api/category'
 export default {
-  name: 'categoryPage',
+  name: 'LayoutCategory',
   data () {
     return {
       activeKey: 0,

@@ -25,7 +25,7 @@
 <script>
 import { getHistorySearch, setHistorySearch } from '@/utils/storage.js'
 export default {
-  name: 'searchIndex',
+  name: 'SearchIndex',
   data () {
     return {
       searchWord: '', // 输入框的内容

@@ -19,7 +19,7 @@
 
 <script>
 const goodsItem = {
-  name: 'GoodsCardVue',
+  name: 'GoodsItem',
   props: {
     item: {
       type: Object,

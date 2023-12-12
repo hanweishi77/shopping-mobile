@@ -31,10 +31,10 @@
 </template>
 
 <script>
-import GoodsItem from '@/components/goodsItem.vue'
+import GoodsItem from '@/components/GoodsItem.vue'
 import { getHomeData } from '@/api/home.js'
 export default {
-  name: 'HomePage',
+  name: 'LayoutHome',
   components: {
     GoodsItem
   },
@@ -49,7 +49,7 @@ export default {
   },
   async created () {
     const { data: { data, message, status } } = await getHomeData()
-    console.log(data, message, status)
+    console.log('@首页数据', data, message, status)
     // console.log(data.pageData.items)
     this.title = data.pageData.page.params.title // 商城标题
     this.bannerList = data.pageData.items[1].data // 轮播图片组

@@ -37,7 +37,7 @@
 <script>
 import { getPicCode, getMsgCode, postLoginCode } from '@/api/login.js'
 export default {
-  name: 'loginIndex',
+  name: 'LoginIndex',
   data: function () {
     return {
       picKey: '', // 图形验证码唯一标识

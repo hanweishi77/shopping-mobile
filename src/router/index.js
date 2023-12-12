@@ -1,19 +1,19 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 
-import layoutIndex from '@/views/layout/index.vue'
-import searchIndex from '@/views/search/index.vue'
-import searchList from '@/views/search/list.vue'
-import productDetailIndex from '@/views/productDetail/index.vue'
-import loginIndex from '@/views/login/index.vue'
-import payIndex from '@/views/pay/index.vue'
-import myOrderIndex from '@/views/myOrder/index.vue'
+import LayoutIndex from '@/views/layout/Index.vue'
+import SearchIndex from '@/views/search/Index.vue'
+import SearchList from '@/views/search/List.vue'
+import ProductDetailIndex from '@/views/productDetail/Index.vue'
+import LoginIndex from '@/views/login/Index.vue'
+import PayIndex from '@/views/pay/Index.vue'
+import MyOrderIndex from '@/views/myOrder/Index.vue'
 
 // 导入首页下的二级路由组件
-import homePage from '@/views/layout/home.vue'
-import categoryPage from '@/views/layout/category.vue'
-import cartPage from '@/views/layout/cart.vue'
-import userPage from '@/views/layout/user.vue'
+import LayoutHome from '@/views/layout/Home.vue'
+import LayoutCategory from '@/views/layout/Category.vue'
+import LayoutCart from '@/views/layout/Cart.vue'
+import LayoutUser from '@/views/layout/User.vue'
 
 import store from '@/store'
 
@@ -23,37 +23,37 @@ const routes = [
   {
     path: '/',
     redirect: '/home',
-    component: layoutIndex,
+    component: LayoutIndex,
     children: [
-      { path: '/home', component: homePage },
-      { path: '/category', component: categoryPage },
-      { path: '/cart', component: cartPage },
-      { path: '/user', component: userPage }
+      { path: '/home', component: LayoutHome },
+      { path: '/category', component: LayoutCategory },
+      { path: '/cart', component: LayoutCart },
+      { path: '/user', component: LayoutUser }
     ]
   },
   {
     path: '/login',
-    component: loginIndex
+    component: LoginIndex
   },
   {
     path: '/search',
-    component: searchIndex
+    component: SearchIndex
   },
   {
     path: '/searchList',
-    component: searchList
+    component: SearchList
   },
   {
     path: '/productDetail/:id',
-    component: productDetailIndex
+    component: ProductDetailIndex
   },
   {
     path: '/pay',
-    component: payIndex
+    component: PayIndex
   },
   {
     path: '/myorder',
-    component: myOrderIndex
+    component: MyOrderIndex
   }
 ]
 // 创建VueRouter实例

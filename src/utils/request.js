@@ -5,7 +5,7 @@ import store from '@/store/index.js'
 // 创建 axios新实例，进行自定义配置
 const axiosInstance = axios.create({
   baseURL: 'http://cba.itlike.com/public/index.php?s=/api/',
-  timeout: 5000
+  timeout: 6000
 })
 // Add a request interceptor
 axiosInstance.interceptors.request.use(function (config) {

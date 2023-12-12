@@ -32,15 +32,15 @@
       </div>
       <div class="footer-fixed">
         <div class="all-check">
-          <van-checkbox icon-size="18"></van-checkbox>
+          <van-checkbox icon-size="18" :value="$store.getters['cart/isAllChecked']"  @click="toggleCheckAll"></van-checkbox>
           全选
         </div>
         <div class="all-total">
           <div class="price">
             <span>合计：</span>
-            <span>¥ <i class="totalPrice">177.00</i></span>
+            <span>¥ <i class="totalPrice">{{$store.getters['cart/selPrice']}}</i></span>
           </div>
-          <div v-if="!isEdit"  class="goPay">结算(3)</div>
+          <div v-if="!isEdit"  class="goPay">结算({{cartTotal}})</div>
           <div v-else class="delete"  @click="handleDelCart">删除</div>
         </div>
       </div>
@@ -57,47 +57,58 @@
 
 <script>
 import CountBox from '@/components/CountBox.vue'
-import { mapState } from 'vuex'
+import { mapState, mapGetters } from 'vuex'
 export default {
-  name: 'cartPage',
+  name: 'LayoutCart',
   components: {
     CountBox
   },
   data: function () {
     return {
-      isEdit: false
+      isEdit: false // 是否编辑
     }
   },
   computed: {
+    // 购物车商品列表
     ...mapState('cart', ['cartList']),
+    // 购物车商品总数
+    ...mapGetters('cart', ['cartTotal']),
+    // 是否登录
     isLogin () {
       // console.log('@@', this.$store.state.user)
       return this.$store.state.user.userInfo.token
     }
   },
+  created () {
+    // 已经登录的用户,去后台获取用户购物车列表（actions异步任务）
+    // 未登录的用户,购物车列表默认为空
+    // console.log(this.isLogin)
+    if (this.isLogin) {
+      this.$store.dispatch('cart/getCartAction')
+    }
+  },
   methods: {
+    // 切换单项商品选中状态
     toggleCheck (goodsId) {
       this.$store.commit('cart/toggleCheck', goodsId)
     },
+    // 切换所有商品选中状态
+    toggleCheckAll () {
+      this.$store.commit('cart/toggleCheckAll', !this.$store.getters['cart/isAllChecked'])
+    },
+    // 修改商品数量
     changeCount (goodsNum, goodsId, goodsSkuId) {
-      // 去进行数量的修改,并更新到后台服务器
+      // 去进行数量的修改,更新到后台服务器（actions异步任务）
       this.$store.dispatch('cart/changeCountAction', {
         goodsNum,
         goodsId,
         goodsSkuId
       })
     },
-    // 去删除购物车数据，并更新到后台服务器
+    // 去删除购物车数据，并更新到后台服务器（actions异步任务）
     async handleDelCart () {
       await this.$store.dispatch('cart/delCartAction')
       this.isEdit = false
-    }
-  },
-  created () {
-    // 必须是登录过的用户，才能用户购物车列表
-    // console.log(this.isLogin)
-    if (this.isLogin) {
-      this.$store.dispatch('cart/getCartAction')
     }
   }
 }
@@ -225,6 +236,12 @@ export default {
       }
     }
   }
+}
+.cart::after {
+  content: '';
+  display: block;
+  width: 100%;
+  height: 40px;
 }
 .empty-cart {
   padding: 80px 30px;

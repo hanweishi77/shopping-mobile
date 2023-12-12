@@ -2,10 +2,9 @@
   <div class="prodetail">
     <van-nav-bar fixed title="商品详情页" left-arrow @click-left="$router.go(-1)" />
     <van-swipe :autoplay="4000" @change="onChange">
-      <van-swipe-item v-for="index in 3" :key="index">
-        <img src="../../assets/banner2.jpg" />
+      <van-swipe-item v-for="(image, index) in images " :key="index">
+        <img :src="image.external_url" />
       </van-swipe-item>
-
       <template #indicator>
         <div class="custom-indicator">{{ current + 1 }} / {{ images.length }}</div>
       </template>
@@ -14,13 +13,13 @@
     <div class="info">
       <div class="title">
         <div class="price">
-          <span class="now">￥1000</span>
-          <span class="oldprice">￥1200</span>
+          <span class="now">￥{{detail.goods_price_max}}</span>
+          <span class="oldprice">￥{{detail.line_price_max}}</span>
         </div>
-        <div class="sellcount">已售 3576 件</div>
+        <div class="sellcount">已售 {{detail.goods_sales}} 件</div>
       </div>
       <div class="msg text-ellipsis-2">
-        商品名称介绍特性介绍特性介绍特性介绍特性介绍特性
+        {{detail.goods_name}}
       </div>
       <div class="service">
         <div class="left-words">
@@ -28,34 +27,34 @@
           <span><van-icon name="passed" />48小时发货</span>
         </div>
         <div class="right-icon">
-          <van-icon name="arrow" />
+          <van-icon name="arrow" @click="showServiceFn"/>
         </div>
       </div>
     </div>
     <!-- 商品评价 -->
     <div class="comment">
       <div class="comment-title">
-        <div class="left">商品评价 (300条)</div>
+        <div class="left">商品评价 ({{commentTotal}}条)</div>
         <div class="right">查看更多 <van-icon name="arrow" /> </div>
       </div>
       <div class="comment-list">
-        <div class="comment-item" v-for="item in 3" :key="item">
+        <div class="comment-item" v-for="item in commentList" :key="item.comment_id">
           <div class="top">
-            <img src="../../assets/main.png" alt="">
-            <div class="name">用户呢称呢</div>
-            <van-rate :size="16" value=2 color="#ffd21e" void-icon="star" void-color="#eee"/>
+            <img :src="item.user.avatar_url" alt="">
+            <div class="name">{{ item.user.nick_name }}</div>
+            <van-rate :size="16" :value="item.score / 2" color="#ffd21e" void-icon="star" void-color="#eee"/>
           </div>
           <div class="content">
-            评论介绍
+            {{ item.content }}
           </div>
           <div class="time">
-            2023-11-09
+            {{ item.create_time }}
           </div>
         </div>
       </div>
     </div>
     <!-- 商品描述 -->
-    <div class="desc">
+    <div class="desc" v-html="detail.content">
     </div>
     <!-- 底部 -->
     <div class="to-fixed-bottom">
@@ -65,12 +64,12 @@
           <span>首页</span>
         </div>
         <div @click="$router.push('/cart')" class="icon-cart">
-          <span v-if="true" class="num">4</span>
+          <span v-if="true" class="num">{{ cartTotal }}</span>
           <van-icon name="shopping-cart-o" />
           <span>购物车</span>
         </div>
-        <div  class="btn-add">加入购物车</div>
-        <div  class="btn-buy">立刻购买</div>
+        <div  class="btn-add" @click="showPannelCartFn">加入购物车</div>
+        <div  class="btn-buy" @click="showPannelBuyNowFn">立刻购买</div>
       </div>
     </div>
     <!-- 加入购物车/立即购买 公用的弹层 -->
@@ -78,30 +77,39 @@
       <div class="product">
         <div class="product-title">
           <div class="left">
-            <img src="../../assets/product.jpg" alt="">
+            <img :src="detail.goods_image" alt="">
           </div>
           <div class="right">
             <div class="price">
               <span>¥</span>
-              <span class="nowprice">300</span>
+              <span class="nowprice">{{ detail.goods_price_max }}</span>
             </div>
             <div class="count">
               <span>库存</span>
-              <span>3000</span>
+              <span>{{ detail.stock_total }}</span>
             </div>
           </div>
         </div>
         <div class="num-box">
           <span>数量</span>
-          <!-- v-model 本质上 :value 和 @input 的简写 -->
-          <CountBox v-model="addCount"></CountBox>
+          <!-- 给组件传value的值,@input方法接受子组件通信-->
+          <CountBox v-bind:value="addCount" v-on:input="(num) => { addCount = num }"></CountBox>
         </div>
         <!-- 有库存才显示提交按钮 -->
-        <div class="showbtn" v-if="true">
-          <div class="btn" v-if="mode === 'cart'">加入购物车</div>
+        <div class="showbtn" v-if="detail.stock_total > 0">
+          <div class="btn" v-if="mode === 'cart'" @click="addCartFn()">加入购物车</div>
           <div class="btn now" v-else>立刻购买</div>
         </div>
         <div class="btn-none" v-else>该商品已抢完</div>
+      </div>
+    </van-action-sheet>
+    <!-- 服务弹层 -->
+    <van-action-sheet v-model="showService" title="服务">
+      <div class="content">
+        <div class="text"><van-icon name="passed" />七天无理由退货</div>
+        <div class="text description">满足相应条件时，消费者可申请7天无理由退货</div>
+        <div class="text"><van-icon name="passed" />48小时发货</div>
+        <div class="text description" >下单后48小时之内发货</div>
       </div>
     </van-action-sheet>
   </div>
@@ -109,31 +117,92 @@
 
 <script>
 import CountBox from '@/components/CountBox.vue'
+import { getProDetail, getProComments } from '@/api/product.js'
+import { addCart } from '@/api/cart.js'
+import { loginConfirm } from '@/mixins/loginConfirm.js'
 export default {
-  name: 'productDetailIndex',
+  name: 'ProductDetailIndex',
+  mixins: [loginConfirm],
   components: {
     CountBox
   },
   data () {
     return {
-      current: 0,
-      images: [],
+      current: 0, // 轮播图当前页码
+      images: [], // 轮播图图片组
+      detail: {}, // 商品详细数据
+      commentTotal: 0, // 评价总数
+      commentList: [], // 评价列表
       showPannel: false, // 控制弹层的显示隐藏
-      mode: 'cart', // 标记弹层状态
-      addCount: 1 // 数字框绑定的数据
+      showService: false, // 控制弹层的显示隐藏
+      mode: 'cart', // 标记弹层模式，默认购物车
+      addCount: 1, // 商品的数字框绑定的数据
+      cartTotal: 0 // 购物车商品总数
     }
   },
   computed: {
+    // 商品ID
     goodsId () {
       return this.$route.params.id
     }
   },
+  async created () {
+    if (this.loginConfirm) {
+      await this.$store.dispatch('cart/getCartAction')
+      // console.log('@@@cartTotal', this.$store.getters['cart/cartTotal'])
+      this.cartTotal = this.$store.getters['cart/cartTotal']
+    }
+    this.handleProDetail()
+    this.handleProComments()
+  },
   methods: {
+    // 产品轮播图当前页码
     onChange (index) {
       this.current = index
+    },
+    // 弹层显示 服务说明
+    showServiceFn () {
+      this.showService = true
+    },
+    // 弹层显示 加入购物车
+    showPannelCartFn () {
+      this.mode = 'cart'
+      this.showPannel = true
+    },
+    // 弹层显示 立即购买
+    showPannelBuyNowFn () {
+      this.mode = 'buyNow'
+      this.showPannel = true
+    },
+    // 加入购物车
+    async addCartFn () {
+      // 用户未登录
+      if (!this.loginConfirm()) {
+        return
+      }
+      // 用户已登录,添加商品到后台
+      const { data } = await addCart(this.goodsId, this.addCount, this.detail.skuList[0].goods_sku_id)
+      // console.log(data.message, data.status, data.data)
+      this.cartTotal = data.data.cartTotal
+      this.$toast(data.message)
+      this.showPannel = false
+    },
+    // 商品展示数据
+    async handleProDetail () {
+      // 后台获取商品详细信息
+      const { data: { data: { detail } } } = await getProDetail(this.goodsId)
+      console.log('@商品展示数据', detail)
+      this.detail = detail
+      this.images = detail.goods_images
+    },
+    // 商品评价数据
+    async handleProComments () {
+      // 后台获取商品评价数据,限制8条
+      const { data: { data } } = await getProComments(this.goodsId, 8)
+      // console.log('@res', data)
+      this.commentList = data.list
+      this.commentTotal = data.total
     }
-  },
-  created () {
   }
 }
 </script>
@@ -288,8 +357,7 @@ export default {
 .tips {
   padding: 10px;
 }
-
-// 弹层的样式
+// 购买的弹层的样式
 .product {
   .product-title {
     display: flex;
@@ -338,6 +406,7 @@ export default {
   }
 }
 
+// 底部
 .footer .icon-cart {
   position: relative;
   padding: 0 6px;
@@ -352,6 +421,21 @@ export default {
     text-align: center;
     background-color: #ee0a24;
     border-radius: 50%;
+  }
+}
+// 服务弹层
+.content {
+  padding: 10px 20px;
+  .text {
+    padding: 10px 0;
+  }
+  .description {
+    font-size: 12px;
+    text-indent: 15px;
+  }
+  .van-icon-passed {
+    color: red;
+    margin-right: 4px;
   }
 }
 </style>

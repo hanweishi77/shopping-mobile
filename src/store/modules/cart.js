@@ -5,7 +5,7 @@ export default {
   namespaced: true,
   state () {
     return {
-      cartList: []
+      cartList: [] // 默认购物车商品列表空
     }
   },
   mutations: {
@@ -20,6 +20,12 @@ export default {
       goods.isChecked = !goods.isChecked
       console.log('@goods.isChecked', goods.isChecked)
     },
+    // 提供让全部商品isChecked取反的方法，不去数据库维护选中状态
+    toggleCheckAll (state, flag) {
+      state.cartList.forEach(item => {
+        item.isChecked = flag
+      })
+    },
     // 提供一个更改cartList中商品数量的 mutation
     changeCount (state, { goodsId, goodsNum }) {
       const goods = state.cartList.find(item => item.goods_id === goodsId)
@@ -27,11 +33,10 @@ export default {
     }
   },
   actions: {
-    // 获取购物车商品数据
+    // 后台获取购物车商品数据
     async getCartAction (context) {
       // 从后台获取购物车商品数据
       const { data: { data } } = await getCartList()
-      console.log('@从后台获取的购物车列表', data)
       // 后台返回的数据中，不包含复选框的选中状态
       // 需要手动维护数据，给每一项，添加一个 isChecked 状态 (标记当前商品是否选中)
       data.list.forEach(item => {
@@ -53,7 +58,7 @@ export default {
     async delCartAction (context) {
       // 获取选择删除的商品列表
       const selCartList = context.getters.selCartList
-      console.log('@获取选择删除的商品列表', selCartList)
+      // console.log('@获取选择删除的商品列表', selCartList)
       // 获取删除商品组的id数组
       const cartIds = selCartList.map(item => item.id)
       // 去后台删除购物车数据
@@ -67,6 +72,21 @@ export default {
     // 选中的商品项
     selCartList (state) {
       return state.cartList.filter(item => item.isChecked)
+    },
+    // 购物车商品总量
+    cartTotal (state) {
+      return state.cartList.reduce((sum, item) => sum + item.goods_num, 0)
+    },
+    // 选中的总价
+    selPrice (state, getters) {
+      return getters.selCartList.reduce(
+        (sum, item) =>
+          sum + item.goods_num * item.goods.goods_price_max, 0
+      ).toFixed(2)
+    },
+    // 商品是否全选
+    isAllChecked (state) {
+      return state.cartList.every(item => item.isChecked)
     }
   }
 }
