@@ -87,12 +87,22 @@ export default {
   name: 'LayoutUser',
   computed: {
     isLogin () {
-      return this.$store.state.user.userInfo.token
+      return this.$store.getters.token
     }
   },
   methods: {
     logout () {
-      console.log('退出功能未完成')
+      this.$dialog.confirm({
+        title: '温馨提示',
+        message: '你确认要退出么'
+      })
+        .then(() => {
+          // on confirm
+          this.$store.dispatch('user/logout')
+        })
+        .catch(() => {
+          // on cancel
+        })
     }
   }
 }
@@ -161,7 +171,8 @@ export default {
   display: flex;
   padding: 15px 0;
   margin: 10px;
-  font-size: 14px;
+  font-size: 12px;
+  color: #646566;
   background-color: #fff;
   border-radius: 5px;
   .order-navbar-item {
@@ -179,14 +190,9 @@ export default {
 .service {
   background-color: #fff;
   .title {
-    padding: 15px 0 0 15px;
+    padding: 15px 0 0 20px;
     color: #646566;
     font-size: 16px;
-  }
-  ::v-deep {
-    .van-tabbar-item--active {
-      color: #646566;
-    }
   }
 }
 .logout-btn {

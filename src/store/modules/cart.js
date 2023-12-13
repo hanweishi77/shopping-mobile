@@ -39,11 +39,13 @@ export default {
       const { data: { data } } = await getCartList()
       // 后台返回的数据中，不包含复选框的选中状态
       // 需要手动维护数据，给每一项，添加一个 isChecked 状态 (标记当前商品是否选中)
-      data.list.forEach(item => {
-        item.isChecked = true
-      })
-      // 设置数据的全局状态
-      context.commit('setCartList', data.list)
+      if (data.list) {
+        data.list.forEach(item => {
+          item.isChecked = true
+        })
+        // 设置数据的全局状态
+        context.commit('setCartList', data.list)
+      }
     },
     // 修改购物车商品数量
     async changeCountAction (context, obj) {
