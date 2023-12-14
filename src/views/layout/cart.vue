@@ -40,7 +40,7 @@
             <span>合计：</span>
             <span>¥ <i class="totalPrice">{{$store.getters['cart/selPrice']}}</i></span>
           </div>
-          <div v-if="!isEdit"  class="goPay">结算({{cartTotal}})</div>
+          <div v-if="!isEdit" class="goPay"  @click="$router.push('/pay')">结算({{cartTotal}})</div>
           <div v-else class="delete"  @click="handleDelCart">删除</div>
         </div>
       </div>

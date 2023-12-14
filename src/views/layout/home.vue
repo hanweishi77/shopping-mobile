@@ -24,7 +24,7 @@
     <div class="guess">
       <p class="guess-title">—— 猜你喜欢 ——</p>
       <div class="goods-list">
-        <GoodsItem v-for="item in proList" :key="item.goods_id" :item='item'></GoodsItem>
+        <GoodsItem v-for="item in proList" :key="item.goods_id" :item='item'>C</GoodsItem>
       </div>
     </div>
   </div>

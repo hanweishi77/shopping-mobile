@@ -98,7 +98,7 @@
         <!-- 有库存才显示提交按钮 -->
         <div class="showbtn" v-if="detail.stock_total > 0">
           <div class="btn" v-if="mode === 'cart'" @click="addCartFn()">加入购物车</div>
-          <div class="btn now" v-else>立刻购买</div>
+          <div class="btn now" v-else  @click="$router.push('/pay')">立刻购买</div>
         </div>
         <div class="btn-none" v-else>该商品已抢完</div>
       </div>
