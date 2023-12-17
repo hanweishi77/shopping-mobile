@@ -8,12 +8,15 @@ import ProductDetailIndex from '@/views/productDetail/Index.vue'
 import LoginIndex from '@/views/login/Index.vue'
 import PayIndex from '@/views/pay/Index.vue'
 import MyOrderIndex from '@/views/myOrder/Index.vue'
+import AdressIndex from '@/views/adress/Index.vue'
 
-// 导入首页下的二级路由组件
+// 导入首页layout下的二级路由组件
 import LayoutHome from '@/views/layout/Home.vue'
 import LayoutCategory from '@/views/layout/Category.vue'
 import LayoutCart from '@/views/layout/Cart.vue'
 import LayoutUser from '@/views/layout/User.vue'
+// 待定
+import AddAdress from '@/views/adress/AddAdress.vue'
 
 import store from '@/store'
 
@@ -54,11 +57,19 @@ const routes = [
   {
     path: '/myorder',
     component: MyOrderIndex
+  },
+  {
+    path: '/adress',
+    component: AdressIndex
+  },
+  {
+    path: '/addadress',
+    component: AddAdress
   }
 ]
 // 创建VueRouter实例
 const router = new VueRouter({
-  mode: 'history',
+  mode: 'history', // 无#号
   routes: routes
 })
 // 所有的路由在真正被访问到之前(解析渲染对应组件页面前)，都会先经过全局前置守卫

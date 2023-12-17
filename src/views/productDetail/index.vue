@@ -98,7 +98,7 @@
         <!-- 有库存才显示提交按钮 -->
         <div class="showbtn" v-if="detail.stock_total > 0">
           <div class="btn" v-if="mode === 'cart'" @click="addCartFn()">加入购物车</div>
-          <div class="btn now" v-else  @click="$router.push('/pay')">立刻购买</div>
+          <div class="btn now" v-else  @click="buyNow">立刻购买</div>
         </div>
         <div class="btn-none" v-else>该商品已抢完</div>
       </div>
@@ -178,6 +178,7 @@ export default {
     async addCartFn () {
       // 用户未登录
       if (!this.loginConfirm()) {
+        this.showPannel = false
         return
       }
       // 用户已登录,添加商品到后台
@@ -202,6 +203,22 @@ export default {
       // console.log('@res', data)
       this.commentList = data.list
       this.commentTotal = data.total
+    },
+    buyNow () {
+      if (!this.loginConfirm()) {
+        console.log('没登录呢')
+        this.showPannel = false
+        return
+      }
+      this.$router.push({
+        path: '/pay',
+        query: {
+          mode: 'buyNow',
+          goodsId: this.goodsId,
+          goodsNum: this.addCount,
+          goodsSkuId: this.detail.skuList[0].goods_sku_id
+        }
+      })
     }
   }
 }

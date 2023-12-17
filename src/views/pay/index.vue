@@ -1,53 +1,55 @@
 <template>
   <div class="pay">
-    <van-nav-bar title="订单结算台" left-text="返回" left-arrow  @click-left="$router.go(-1)" />
-    <van-contact-card
-      :type="currentContact.type"
-      :name="currentContact.name"
-      :tel="currentContact.tel"
-      @click="onEdit"
-    />
-    <div class="goods">
+    <!-- 顶部 -->
+    <van-nav-bar title="订单结算台" left-arrow  @click-left="$router.go(-1)" />
+    <!-- 地址 -->
+    <div class="address" @click="$router.push('/adress')">
+      <div class="left-icon">
+        <van-icon name="location-o" />
+      </div>
+      <div class="info" v-if="selectAddress">
+        <div class="info-content">
+          <span class="name">{{ selectAddress.name }}</span>
+          <span class="mobile">{{ selectAddress.phone }}</span>
+        </div>
+        <div class="info-address">
+          {{ longAddress }}
+        </div>
+      </div>
+      <div class="info" v-else>
+        请选择配送地址
+      </div>
+      <div class="right-icon">
+        <van-icon name="arrow" />
+      </div>
+    </div>
+    <!-- 下单商品列表 -->
+    <div class="goods" v-if="order.goodsList">
       <ul>
-        <li class="goods-item">
+        <li class="goods-item" v-for="item in order.goodsList" :key="item.goods_id">
           <div class="goods-item-left">
-            <img src="@/assets/product.jpg" alt="" />
+            <img :src="item.goods_image" alt="" />
           </div>
           <div class="goods-item-right">
             <div class="goods-name twoline-hide">
-              荷仕兰新西兰原装进口 暖阳高端中老年奶粉375g罐装
-              高钙高铁高硒 无添加蔗糖低GI配方糖尿三高放心力免疫乳铁蛋白
+             {{ item.goods_name }}
             </div>
             <div class="goods-detail">
-              <span>x<i>2</i></span>
-              <span>￥<i>2000.00</i></span>
-            </div>
-          </div>
-        </li>
-        <li class="goods-item">
-          <div class="goods-item-left">
-            <img src="@/assets/product.jpg" alt="" />
-          </div>
-          <div class="goods-item-right">
-            <div class="goods-name twoline-hide">
-              荷仕兰新西兰原装进口 暖阳高端中老年奶粉375g罐装
-              高钙高铁高硒 无添加蔗糖低GI配方糖尿三高放心力免疫乳铁蛋白
-            </div>
-            <div class="goods-detail">
-              <span>x<i>2</i></span>
-              <span>￥<i>2000.00</i></span>
+              <span>x<i>{{ item.total_num }}</i></span>
+              <span>￥<i>{{ item.total_pay_price }}</i></span>
             </div>
           </div>
         </li>
       </ul>
       <div class="flow-num-box">
-        <div>共<i>5</i>件商品,合计:<span>￥<i>2444.50</i></span></div>
+        <div>共<i>{{ order.orderTotalNum }}</i>件商品,合计:<span>￥<i>{{ order.orderTotalPrice }}</i></span></div>
       </div>
     </div>
+    <!-- 支付详情 -->
     <div class="pay-detail">
       <div class="pay-cell">
         <span>订单总金额：</span>
-        <span class="red">￥2002.00</span>
+        <span class="red">￥{{ order.orderTotalPrice }}</span>
       </div>
       <div class="pay-cell">
         <span>优惠券：</span>
@@ -55,15 +57,15 @@
       </div>
       <div class="pay-cell">
         <span>配送费用：</span>
-        <span v-if="false">请先选择配送地址</span>
-        <span v-else class="red">+￥2333.00</span>
+        <span v-if="!selectAddress">请先选择配送地址</span>
+        <span v-else class="red">+￥0.00</span>
       </div>
     </div>
     <!-- 支付方式 -->
     <div class="pay-way">
       <span class="tip">支付方式</span>
       <div class="pay-cell">
-        <span><van-icon name="balance-o" />余额支付（可用 ¥ 23444 元）</span>
+        <span><van-icon name="balance-o" />余额支付（可用 ¥ {{ personal.balance }} 元）</span>
         <!-- <span>请先选择配送地址</span> -->
         <span class="red"><van-icon name="passed" /></span>
       </div>
@@ -74,28 +76,103 @@
     </div>
     <!-- 底部提交 -->
     <div class="footer-fixed">
-      <div class="left">实付款：<span>￥2555.00</span></div>
-      <div class="pay-btn">提交订单</div>
+      <div class="left">实付款：<span>￥{{ order.orderTotalPrice }}</span></div>
+      <div class="pay-btn" @click="submitOrder">提交订单</div>
     </div>
   </div>
 </template>
 
 <script>
+import { getAddressList } from '@/api/adress.js'
+import { checkOrder, submitOrder } from '@/api/order.js'
 export default {
   name: 'PayIndex',
   data () {
     return {
-      currentContact: {
-        type: 'add', // 默认add
-        name: '张三',
-        tel: '13888888888'
-      },
+      addressList: [], // 初始地址列表
+      selectAddress: '', // 默认地址
+      longAddress: '', // 长地址
+      order: {},
+      personal: {},
       remark: '' // 备注留言
     }
   },
+  computed: {
+    // 结算模式 cart buyNow
+    mode () {
+      return this.$route.query.mode
+    },
+    // 购物车列表id
+    cartIds () {
+      return this.$route.query.cartIds
+    },
+    // 商品id
+    goodsId () {
+      return this.$route.query.goodsId
+    },
+    // 商品分类id
+    goodsSkuId () {
+      return this.$route.query.goodsSkuId
+    },
+    // 商品数
+    goodsNum () {
+      return this.$route.query.goodsNum
+    }
+  },
+  created () {
+    this.getAddress()
+    this.getOrderList()
+  },
   methods: {
-    onEdit () {
-      this.$toast('编辑')
+    // 获取送货地址
+    async getAddress () {
+      const { data: { data: { list } } } = await getAddressList()
+      console.log(list)
+      this.addressList = list
+      this.selectAddress = list[1] // 默认第二个地址及长地址
+      const region = list[1].region
+      this.longAddress = region.province + region.city + region.region + list[1].detail
+    },
+    // 获取结算列表
+    async getOrderList () {
+      // 购物车结算
+      if (this.mode === 'cart') {
+        const { data: { data: { order, personal } } } = await checkOrder(this.mode, {
+          cartIds: this.cartIds
+        })
+        console.log('@order', order, '@personal', personal, '@ids', this.cartIds)
+        this.order = order
+        this.personal = personal
+      }
+      // 立刻购买结算
+      if (this.mode === 'buyNow') {
+        const { data: { data: { order, personal } } } = await checkOrder(this.mode, {
+          goodsId: this.goodsId,
+          goodsSkuId: this.goodsSkuId,
+          goodsNum: this.goodsNum
+        })
+        this.order = order
+        this.personal = personal
+      }
+    },
+    // 提交订单
+    async submitOrder () {
+      if (this.mode === 'cart') {
+        await submitOrder(this.mode, {
+          remark: this.remark,
+          cartIds: this.cartIds
+        })
+      }
+      if (this.mode === 'buyNow') {
+        await submitOrder(this.mode, {
+          remark: this.remark,
+          goodsId: this.goodsId,
+          goodsSkuId: this.goodsSkuId,
+          goodsNum: this.goodsNum
+        })
+      }
+      this.$toast.success('支付成功')
+      this.$router.replace('/myorder')
     }
   }
 }
@@ -105,6 +182,30 @@ export default {
 .pay {
   font-size: 14px;
 }
+// 地址
+.address {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 20px;
+  margin-right: 5px;
+  font-size: 14px;
+  color: #666;
+  position: relative;
+  background: url(@/assets/border-line.png) bottom repeat-x;
+  background-size: 60px auto;
+  .left-icon {
+    font-size: 20px;
+    margin-right: 20px;
+  }
+  .right-icon {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-7px);
+  }
+}
+// 商品
 .goods {
   margin-top: 18px;
   .goods-item {
@@ -169,6 +270,7 @@ export default {
     i { font-style: normal; }
   }
 }
+// 支付详情
 .pay-detail {
   border-bottom: 1px solid #efefef;
   .pay-cell {
@@ -181,6 +283,7 @@ export default {
     }
   }
 }
+// 支付方式
 .pay-way {
   padding: 10px 12px;
   border-bottom: 1px solid #efefef;
@@ -197,6 +300,7 @@ export default {
     margin-right: 5px;
   }
 }
+// 买家建议
 .buytips {
   display: block;
   textarea {
@@ -208,6 +312,7 @@ export default {
     height: 100px;
   }
 }
+// 底部提交
 .footer-fixed {
   position: fixed;
   background-color: #fff;

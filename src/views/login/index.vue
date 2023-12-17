@@ -51,7 +51,6 @@ export default {
     }
   },
   async created () {
-    console.log('页面元素已创建1')
     try {
       await this.getPicCode()
     } catch (error) {

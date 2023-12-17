@@ -4,12 +4,12 @@
     <div v-if="isLogin && cartList.length > 0">
       <!-- 购物车开头 -->
       <div class="cart-title">
-        <span class="all">共<i>5</i>件商品</span>
-        <span v-if="!isEdit" class="edit" @click="isEdit = !isEdit">
+        <span class="all">共<i>{{ cartTotal }}</i>件商品</span>
+        <span v-if="!isEdit" class="edit" @click="isEdit = !isEdit;">
           <van-icon name="edit" />
           编辑
         </span>
-        <span v-else class="edit" @click="isEdit = !isEdit">
+        <span v-else class="edit" @click="isEdit = !isEdit;">
           完成
         </span>
       </div>
@@ -40,7 +40,7 @@
             <span>合计：</span>
             <span>¥ <i class="totalPrice">{{$store.getters['cart/selPrice']}}</i></span>
           </div>
-          <div v-if="!isEdit" class="goPay"  @click="$router.push('/pay')">结算({{cartTotal}})</div>
+          <div v-if="!isEdit" class="goPay"  @click="goPay">结算({{selCount}})</div>
           <div v-else class="delete"  @click="handleDelCart">删除</div>
         </div>
       </div>
@@ -72,19 +72,21 @@ export default {
     // 购物车商品列表
     ...mapState('cart', ['cartList']),
     // 购物车商品总数
-    ...mapGetters('cart', ['cartTotal']),
+    ...mapGetters('cart', ['cartTotal', 'selCount', 'selCartList']),
     // 是否登录
     isLogin () {
       // console.log('@@', this.$store.state.user)
+      // store主模块getters加了token >>>>this.$store.getters.token
       return this.$store.state.user.userInfo.token
     }
   },
-  created () {
+  async created () {
     // 已经登录的用户,去后台获取用户购物车列表（actions异步任务）
     // 未登录的用户,购物车列表默认为空
     // console.log(this.isLogin)
     if (this.isLogin) {
-      this.$store.dispatch('cart/getCartAction')
+      await this.$store.dispatch('cart/getCartAction')
+      console.log('@购物车列表', this.cartList)
     }
   },
   methods: {
@@ -109,6 +111,18 @@ export default {
     async handleDelCart () {
       await this.$store.dispatch('cart/delCartAction')
       this.isEdit = false
+    },
+    goPay () {
+      if (this.selCount > 0) {
+        // 有选中的 商品 才进行结算跳转
+        this.$router.push({
+          path: '/pay',
+          query: {
+            mode: 'cart',
+            cartIds: this.selCartList.map(item => item.id).join(',') // 'cartId,cartId,cartId'
+          }
+        })
+      }
     }
   }
 }

@@ -86,6 +86,10 @@ export default {
           sum + item.goods_num * item.goods.goods_price_max, 0
       ).toFixed(2)
     },
+    // 选择商品数目
+    selCount (state, getters) {
+      return getters.selCartList.reduce((sum, item) => sum + item.goods_num, 0)
+    },
     // 商品是否全选
     isAllChecked (state) {
       return state.cartList.every(item => item.isChecked)
