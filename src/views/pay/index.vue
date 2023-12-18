@@ -172,7 +172,7 @@ export default {
         })
       }
       this.$toast.success('支付成功')
-      this.$router.replace('/myorder')
+      setTimeout(() => { this.$router.replace('/myorder') }, 1000)
     }
   }
 }

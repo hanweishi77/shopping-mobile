@@ -1,6 +1,9 @@
 import Vue from 'vue'
-import { AddressEdit, AddressList, ContactCard, Dialog, ActionSheet, Rate, Checkbox, Sidebar, SidebarItem, Button, Icon, Tabbar, TabbarItem, NavBar, Toast, Search, Swipe, SwipeItem, Lazyload, Grid, GridItem, Card, Tag } from 'vant'
+import { Pagination, Tab, Tabs, AddressEdit, AddressList, ContactCard, Dialog, ActionSheet, Rate, Checkbox, Sidebar, SidebarItem, Button, Icon, Tabbar, TabbarItem, NavBar, Toast, Search, Swipe, SwipeItem, Lazyload, Grid, GridItem, Card, Tag } from 'vant'
 
+Vue.use(Pagination)
+Vue.use(Tab)
+Vue.use(Tabs)
 Vue.use(AddressEdit)
 Vue.use(AddressList)
 Vue.use(ContactCard)

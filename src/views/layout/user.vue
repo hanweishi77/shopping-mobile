@@ -6,7 +6,7 @@
         <img src="@/assets/default-avatar.png" alt="" />
       </div>
       <div class="info">
-        <div class="nickname">张三</div>
+        <div class="nickname">{{ detail.mobile }}</div>
         <div class="grand">
           <van-icon name="diamond-o" />
           普通会员
@@ -26,7 +26,7 @@
     <div class="my-asset">
       <div class="asset-left">
         <div class="asset-left-item">
-          <span>0</span>
+          <span>{{ detail.pay_money || 0 }}</span>
           <span>账户余额</span>
         </div>
         <div class="asset-left-item">
@@ -83,11 +83,22 @@
 </template>
 
 <script>
+import { getUserInfoDetail } from '@/api/userInfo.js'
 export default {
   name: 'LayoutUser',
+  data () {
+    return {
+      detail: {}
+    }
+  },
   computed: {
     isLogin () {
       return this.$store.getters.token
+    }
+  },
+  created () {
+    if (this.isLogin) {
+      this.getUserInfoDetail()
     }
   },
   methods: {
@@ -100,9 +111,15 @@ export default {
           // on confirm
           this.$store.dispatch('user/logout')
         })
-        .catch(() => {
+        .catch(
           // on cancel
-        })
+          () => {}
+        )
+    },
+    async getUserInfoDetail () {
+      const { data: { data: { userInfo } } } = await getUserInfoDetail()
+      this.detail = userInfo
+      console.log(this.detail)
     }
   }
 }

@@ -9,7 +9,7 @@
         </van-sidebar>
       </div>
       <div class="right">
-        <div class="card" v-for="item in list[activeKey]?.children" :key="item.category_id">
+        <div class="card" @click="$router.push(`/searchlist?categoryId=${item.category_id}`)" v-for="item in list[activeKey]?.children" :key="item.category_id">
           <img :src="item.image?.external_url" alt="">
           <p>{{ item.name }}</p>
         </div>

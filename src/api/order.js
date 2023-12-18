@@ -27,3 +27,19 @@ export const submitOrder = (mode, obj) => {
     ...obj
   })
 }
+// 订单列表
+export const getMyOrderList = (dataType, page) => {
+  return request.get('/order/list', {
+    params: {
+      dataType,
+      page // List
+    }
+  })
+}
+// 取消订单
+export const cancelOrder = (orderId) => {
+  console.log('收到了删除orderId', orderId, typeof orderId)
+  return request.post('/order/cancel', {
+    orderId
+  })
+}

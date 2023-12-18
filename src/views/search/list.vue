@@ -3,7 +3,7 @@
     <van-nav-bar title="商品列表"  left-arrow
       @click-left="$router.go(-1)"
     />
-    <van-search :placeholder="querySearch" input-align="center" show-action
+    <van-search :placeholder="querySearch || '搜索商品'" input-align="center" show-action
       @click="$router.push('/search')" readonly>
       <template #action>
         <van-icon  :name="vanIcon"  size='26' @click="flag = !flag; vanIcon= flag ? 'list-switching' : 'list-switch' " />
