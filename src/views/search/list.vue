@@ -75,6 +75,7 @@ export default {
     }
   },
   async created () {
+    console.log(this.$route.query.categoryId, this.$route.query.search)
     const { data: { data: { list } } } = await getProList({
       categoryId: this.$route.query.categoryId,
       goodsName: this.querySearch,
